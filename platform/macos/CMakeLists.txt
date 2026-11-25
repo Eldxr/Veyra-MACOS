@@ -4,7 +4,7 @@ if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum macOS version")
 endif()
 
-project(VeyraMacOSMetalProbe VERSION 0.2.0 LANGUAGES CXX OBJCXX)
+project(VeyraMacOSMetalProbe VERSION 0.3.0 LANGUAGES CXX OBJCXX)
 
 if(NOT APPLE)
   message(FATAL_ERROR "The Veyra macOS platform target must be configured on macOS.")
@@ -18,6 +18,7 @@ add_executable(veyra_macos_metal_probe
   main.cpp
   MetalDevice.mm
   MetalComputeProbe.mm
+  MetalRenderProbe.mm
 )
 
 target_compile_options(veyra_macos_metal_probe PRIVATE
