@@ -1,6 +1,9 @@
 #include "MetalDevice.h"
+#include "MetalComputeProbe.h"
 
 int main()
 {
-    return runMetalDeviceProbe();
+    const int deviceResult = runMetalDeviceProbe();
+    if (deviceResult != 0) return deviceResult;
+    return runMetalComputeProbe();
 }
