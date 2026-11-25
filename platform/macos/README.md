@@ -1,10 +1,10 @@
 # Veyra for macOS — platform port
 
-This directory is the start of a separate Apple-platform implementation. It is deliberately not wired into the existing root CMake project yet: the current root build returns to the Linux OBS-only target for every non-Windows platform, while the main application and renderer are Windows/Win32/D3D12-specific. Keeping the first macOS target isolated avoids changing or destabilizing the Windows release build.
+This directory is a separate Apple-platform implementation. It is deliberately not wired into the existing root CMake project yet: the current root build routes non-Windows systems into a Linux OBS-only target, while the main application and renderer are Windows/Win32/D3D12-specific. Keeping the first macOS target isolated avoids changing or destabilizing the Windows release build.
 
-## First milestone: native Metal availability
+## Current milestone: Metal device, compute, and off-screen rendering
 
-The standalone CMake project builds `veyra_macos_metal_probe`. It uses Objective-C++ only at the Metal boundary, obtains the system Metal device, creates a command queue, compiles a small Metal compute kernel at runtime, dispatches it over 256 values, and verifies the GPU results. This is a deterministic compute smoke test, not yet a video renderer: it does **not** render or present video, decode capture-card input, run image enhancement, or provide the Veyra UI.
+The standalone CMake project builds `veyra_macos_metal_probe`. It obtains the system Metal device and command queue, runs a deterministic compute kernel over 256 values and checks the results, then renders a full-screen triangle into a 64x64 BGRA Metal texture and validates the centre pixel. The render test proves a basic Metal render pipeline and off-screen render target work; it does **not** yet display a window, present live video, decode capture-card input, run enhancement models, or provide the Veyra UI.
 
 Build on a Mac:
 
@@ -18,7 +18,7 @@ The target has a macOS 13 deployment floor and is intended to be built for Apple
 
 ## Porting boundaries identified from the existing source
 
-- **UI:** retain the Qt Quick/QML product interface where practical. Replace the Windows-only application entry point and HWND child-video-window hosting with a macOS application lifecycle and a native Metal-backed surface (for example, an `NSView`/CAMetalLayer integration). Do not assume the current Windows `main.cpp` can compile unchanged.
+- **UI:** retain the Qt Quick/QML product interface where practical. Replace the Windows-only application entry point and HWND child-video-window hosting with a macOS application lifecycle and a native Metal-backed surface (for example, an `NSView`/`CAMetalLayer` integration). Do not assume the current Windows `main.cpp` can compile unchanged.
 - **GPU and presentation:** the existing enhancement/presentation implementation is D3D12/DXGI and includes NVIDIA NGX, NVAPI, DirectML, AMD AMF, and Windows-specific presentation hooks. It cannot run on Apple Silicon as-is. Build a separate Metal device/queue, texture, command-buffer, shader, synchronization, and presentation path. Preserve shared algorithm contracts only where their inputs/outputs and licensing permit.
 - **Video ingest and decode:** evaluate VideoToolbox/AVFoundation for hardware decode and capture-device discovery, with CoreMedia timestamps and explicit pixel-format/color metadata. Screen capture should use ScreenCaptureKit. A capture card connected over USB/HDMI must be tested as an actual macOS capture device; HDMI input is not implied by the MacBook's HDMI output.
 - **Media and audio:** keep portable media/format logic where it has no Win32 assumptions; use a macOS-compatible FFmpeg build where needed and CoreAudio/AVAudioEngine for device and clock integration. Preserve source PTS, bounded queues, explicit color handling, and reset behavior.
@@ -28,8 +28,8 @@ The target has a macOS 13 deployment floor and is intended to be built for Apple
 
 ## Next implementation sequence
 
-1. Confirm the Metal device and compute smoke test build in CI for arm64 and run on a real Apple Silicon Mac.
-2. Add a Metal texture render/presentation test with deterministic input/output and GPU-side timing; do not read pixels back in the real-time path.
+1. Run the device, compute, and off-screen render probes in arm64 CI and on a real Apple Silicon Mac.
+2. Replace the off-screen texture with a `CAMetalLayer`-backed native macOS view and verify continuous presentation/resizing.
 3. Establish the Qt 6 macOS app shell and a Metal-backed video surface, preserving QML settings and navigation where feasible.
 4. Port media decode, capture-card input, timestamps, audio, and color metadata.
 5. Add an enhancement graph abstraction and the first Apple-native denoise/upscale implementation, with CPU reference tests and image-quality fixtures.
