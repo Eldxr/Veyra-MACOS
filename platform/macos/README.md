@@ -4,7 +4,7 @@ This directory is the start of a separate Apple-platform implementation. It is d
 
 ## First milestone: native Metal availability
 
-The standalone CMake project builds `veyra_macos_metal_probe`. It uses Objective-C++ only at the Metal boundary, exposes a plain C++ function to the test executable, obtains the system Metal device, and creates a Metal command queue. This proves only that the Mac build can reach Metal; it does **not** yet render video, run enhancement kernels, decode capture-card input, or provide the Veyra UI.
+The standalone CMake project builds `veyra_macos_metal_probe`. It uses Objective-C++ only at the Metal boundary, obtains the system Metal device, creates a command queue, compiles a small Metal compute kernel at runtime, dispatches it over 256 values, and verifies the GPU results. This is a deterministic compute smoke test, not yet a video renderer: it does **not** render or present video, decode capture-card input, run image enhancement, or provide the Veyra UI.
 
 Build on a Mac:
 
@@ -28,8 +28,8 @@ The target has a macOS 13 deployment floor and is intended to be built for Apple
 
 ## Next implementation sequence
 
-1. Make the Metal probe build in CI for arm64 and run it on a real Apple Silicon Mac.
-2. Add a small Metal render/compute test with deterministic input/output and GPU-side timing; do not read pixels back in the real-time path.
+1. Confirm the Metal device and compute smoke test build in CI for arm64 and run on a real Apple Silicon Mac.
+2. Add a Metal texture render/presentation test with deterministic input/output and GPU-side timing; do not read pixels back in the real-time path.
 3. Establish the Qt 6 macOS app shell and a Metal-backed video surface, preserving QML settings and navigation where feasible.
 4. Port media decode, capture-card input, timestamps, audio, and color metadata.
 5. Add an enhancement graph abstraction and the first Apple-native denoise/upscale implementation, with CPU reference tests and image-quality fixtures.
