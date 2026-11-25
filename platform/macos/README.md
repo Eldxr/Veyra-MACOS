@@ -2,9 +2,9 @@
 
 This directory is a separate Apple-platform implementation. It is deliberately not wired into the existing root CMake project yet: the current root build routes non-Windows systems into a Linux OBS-only target, while the main application and renderer are Windows/Win32/D3D12-specific. Keeping the macOS target isolated avoids changing or destabilizing the Windows release build.
 
-## Current milestone: Metal device, compute, off-screen rendering, and native presentation
+## Current milestone: Metal device, compute, off-screen rendering, and first native app shell
 
-The standalone CMake project builds `veyra_macos_metal_probe`. It obtains the system Metal device and command queue, runs a deterministic compute kernel over 256 values and checks the results, then renders a full-screen triangle into a 64x64 BGRA Metal texture and validates the centre pixel. After those checks, it opens a native AppKit window whose `CAMetalLayer` is continuously presented through a Metal command queue. The window currently displays a simple test frame; it is a presentation-surface milestone, not the Veyra UI or a live-video pipeline.
+The standalone CMake project builds `veyra_macos_metal_probe`. It obtains the system Metal device and command queue, runs a deterministic compute kernel over 256 values and checks the results, then renders a full-screen triangle into a 64x64 BGRA Metal texture and validates the centre pixel. After those checks, it opens a native AppKit Veyra-style shell with a sidebar, overview heading, Metal preview surface, and status panels for Xbox streaming, video input, and enhancement. The status panels explicitly show that those features are not connected. This is the first native app-shell milestone, not yet the integrated Qt/QML product UI or a live-video pipeline.
 
 Build on a Mac:
 
@@ -28,8 +28,8 @@ The target has a macOS 13 deployment floor and is intended to be built for Apple
 
 ## Next implementation sequence
 
-1. Verify the native `CAMetalLayer` window builds, presents continuously, and resizes correctly on Apple Silicon.
-2. Establish the Qt 6 macOS app shell and a Metal-backed video surface, preserving QML settings and navigation where feasible.
+1. Build and run the native AppKit shell on Apple Silicon; verify its layout, `CAMetalLayer` preview, and resizing.
+2. Establish the Qt 6 macOS product app shell and a Metal-backed video surface, preserving QML settings and navigation where feasible.
 3. Port media decode, capture-card input, timestamps, audio, and color metadata.
 4. Add an enhancement graph abstraction and the first Apple-native denoise/upscale implementation, with CPU reference tests and image-quality fixtures.
 5. Port Xbox streaming and credential storage behind platform interfaces; validate real console connectivity.
