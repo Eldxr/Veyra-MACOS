@@ -20,6 +20,16 @@ if(NOT VEYRA_DISPLAY_VERSION MATCHES "^${PROJECT_VERSION}")
 endif()
 
 # ---------------------------------------------------------------------------
+# macOS: start with the native Apple Silicon platform target. The full Windows
+# application is still being ported in phases; do not fall through to Linux's
+# OBS-only build on Apple hosts.
+# ---------------------------------------------------------------------------
+if(APPLE)
+  add_subdirectory(platform/macos)
+  return()
+endif()
+
+# ---------------------------------------------------------------------------
 # Linux: the OBS filter module only. Every target below is COM / D3D11 / D3D12
 # / Win32 bound, so the portable part of the pipeline lives in linux/ instead
 # of growing ifdefs through 100k lines of Windows code. See docs/OBS_FILTER.md.
