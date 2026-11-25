@@ -1,6 +1,7 @@
 #include "MetalDevice.h"
 #include "MetalComputeProbe.h"
 #include "MetalRenderProbe.h"
+#include "MetalWindow.h"
 
 int main()
 {
@@ -10,5 +11,8 @@ int main()
     const int computeResult = runMetalComputeProbe();
     if (computeResult != 0) return computeResult;
 
-    return runMetalRenderProbe();
+    const int renderResult = runMetalRenderProbe();
+    if (renderResult != 0) return renderResult;
+
+    return runMetalWindow();
 }
