@@ -1,0 +1,24 @@
+name: macOS Metal probe
+
+on:
+  push:
+    branches:
+      - port/macos-apple-silicon
+    paths:
+      - "platform/macos/**"
+      - ".github/workflows/macos-metal-probe.yml"
+  pull_request:
+    paths:
+      - "platform/macos/**"
+      - ".github/workflows/macos-metal-probe.yml"
+  workflow_dispatch:
+
+jobs:
+  build-arm64:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure arm64 Metal probe
+        run: cmake -S platform/macos -B build/macos -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64
+      - name: Build
+        run: cmake --build build/macos --config Release --parallel 2
